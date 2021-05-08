@@ -53,10 +53,7 @@ class Select(SelectValuesMixin, Q):
     def _compile_dependencies(self):
         dependencies = []
         for table in self.dependencies - set(self._joins):
-            if table.__alias__ == table.__table__:
-                dependencies.append(f'"{table.__table__}"')
-            else:
-                dependencies.append(f'"{table.__table__}" "{table.__alias__}"')
+            dependencies.append(str(table))
         return ', '.join(dependencies)
 
     def _compile_join(self, args):
@@ -64,7 +61,7 @@ class Select(SelectValuesMixin, Q):
         for table, (mode, condition) in self._joins.items():
             if isinstance(condition, Q):
                 joins.append(
-                    f'{mode} JOIN "{table.__table__}" "{table.__alias__}" ON {condition.compile(args)}'
+                    f'{mode} JOIN {table} ON {condition.compile(args)}'
                 )
         return joins
 

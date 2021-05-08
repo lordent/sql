@@ -1,19 +1,13 @@
-class QueryMeta(type):
+class F:
 
-    def __new__(mcs, name, bases, initial):
-        if bases:
-            initial.setdefault('alias', '')
-        return super().__new__(mcs, name, bases, initial)
+    def __init__(self, query: str):
+        self.query = query
 
-    def __getitem__(cls, alias):
-        return type(cls)(cls.__name__, (cls, ), {
-            'alias': alias,
-        })
+    def __str__(self):
+        return self.query
 
 
-class Q(metaclass=QueryMeta):
-
-    __alias__ = ''
+class Q:
 
     def __init__(self, query: str, *args, _dependencies=None, **kwargs):
         self.query = query
@@ -132,6 +126,9 @@ class Q(metaclass=QueryMeta):
 
     def istartswith(self, value):
         return self.__operand__('ILIKE', value, after=" || '%'")
+
+    def contains_regex(self, value):
+        return self.__operand__('~', value)
 
     # ARRAY
 
